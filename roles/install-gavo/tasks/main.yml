@@ -1,0 +1,31 @@
+---
+- block:
+  - name: Make the apt key file
+    file:
+      path: /etc/apt/trusted.gpg.d/gavo-archive.key.asc
+      state: touch
+
+  - name: Add the apt key to file
+    ansible.builtin.apt_key:
+      id: D8C139FC
+      url: https://docs.g-vo.org/archive-key.asc
+      keyring: /etc/apt/trusted.gpg.d/gavo-archive.key.asc
+
+  - name: Add the apt reposotory
+    ansible.builtin.apt_repository:
+      repo: deb http://vo.ari.uni-heidelberg.de/debian release main
+
+  - name: Install gavodachs
+    apt:
+      name: gavodachs2-server
+      state: present
+
+  - name: Make and write to gavo.rc
+    copy:
+      dest: "/etc/gavo.rc"
+      content: |
+        [web]
+        bindAddress: 0.0.0.0
+        sitename: AstroDB
+  become: true
+  become_user: root

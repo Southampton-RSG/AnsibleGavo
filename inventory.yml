@@ -1,0 +1,7 @@
+---
+# file: inventory.yml
+all:
+  children:
+    localvm:
+      hosts:
+        192.168.98.20

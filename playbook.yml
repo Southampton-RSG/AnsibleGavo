@@ -1,0 +1,11 @@
+---
+- name: Install GavoDaCHS
+  hosts: localvm
+
+  remote_user: pgrylls
+  become_method: sudo
+
+  roles:
+    - install-gavo
+    - load-test-data
+    - restart-and-serve

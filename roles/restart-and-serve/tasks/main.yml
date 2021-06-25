@@ -1,0 +1,10 @@
+---
+- name: Stop server
+  command: /etc/init.d/dachs stop
+  become: true
+  become_user: root
+
+- name: Start server
+  command: dachs serve debug
+  become: yes
+  become_user: dachsroot
