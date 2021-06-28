@@ -4,4 +4,6 @@ all:
   children:
     localvm:
       hosts:
-        192.168.98.20
+        192.168.98.21
+      vars:
+        ansible_python_interpreter: /usr/bin/python3

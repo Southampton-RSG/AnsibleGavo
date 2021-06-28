@@ -1,10 +1,19 @@
 ---
-- name: Stop server
-  command: /etc/init.d/dachs stop
-  become: true
-  become_user: root
+- block:
+  - name: Stop server
+    command: /etc/init.d/dachs stop
 
-- name: Start server
-  command: dachs serve debug
+  - name: Setup Dachs server
+    template:
+      src: gavo-service.j2
+      dest: /etc/systemd/system/gavo.service
+
+  - name: Start server
+    service:
+      name: gavo
+      state: started
+      enabled: yes
+      daemon_reload: yes
   become: yes
-  become_user: dachsroot
+  become_method: sudo
+  become_user: root

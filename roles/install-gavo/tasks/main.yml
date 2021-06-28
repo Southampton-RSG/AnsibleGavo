@@ -1,5 +1,10 @@
 ---
 - block:
+  - name: Ensurre gpg is installed
+    apt:
+      name: gpg
+      state: present
+
   - name: Make the apt key file
     file:
       path: /etc/apt/trusted.gpg.d/gavo-archive.key.asc
@@ -28,4 +33,5 @@
         bindAddress: 0.0.0.0
         sitename: AstroDB
   become: true
+  become_method: sudo
   become_user: root
