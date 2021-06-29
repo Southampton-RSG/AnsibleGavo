@@ -9,7 +9,7 @@
       dest: /etc/systemd/system/gavo.service
 
   - name: Start server
-    service:
+    ansible.builtin.systemd:
       name: gavo
       state: started
       enabled: yes

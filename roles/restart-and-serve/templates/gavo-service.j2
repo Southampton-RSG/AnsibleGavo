@@ -5,8 +5,6 @@ Description=dachs server service
 ExecStart=/bin/dachs serve debug
 Restart=always
 KillSignal=SIGQUIT
-Type=notify
-NotifyAccess=all
 
 [Install]
 WantedBy=multi-user.target
