@@ -37,12 +37,9 @@
       state: present
 
   - name: Make and write to gavo.rc
-    copy:
-      dest: "/etc/gavo.rc"
-      content: |
-        [web]
-        bindAddress: 0.0.0.0
-        sitename: AstroDB
+    template:
+      src: gavo.rc.j2
+      dest: /etc/gavo.rc
   become: true
   become_method: sudo
   become_user: root

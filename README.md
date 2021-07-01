@@ -35,6 +35,7 @@ you are running the deployment script from.
 - roles 
     - install-gavo
         - tasks/main: Adds the apt-key, installs, and configures gavodachs2-server
+        - templates/gavo.rc.j2: This is a templating file that becomes the gavo.rc file its the place to go to configure the gavodachs server
     - load-test-data
         - tasks/main: Downloads the resource descriptor and data file then imports using dachs imp
     - restart-and-serve

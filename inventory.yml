@@ -2,8 +2,8 @@
 # file: inventory.yml
 all:
   children:
-    localvm:
-      hosts:
-        192.168.98.23
+    system:
+      host:
+        ip.ip.ip.ip
       vars:
         ansible_python_interpreter: /usr/bin/python3
