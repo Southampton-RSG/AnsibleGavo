@@ -1,5 +1,10 @@
 ---
-- block:
+- name: Gather package facts
+  ansible.builtin.package_facts:
+    manager: apt
+
+- name: Ensure gavodachs2-server is in the apt reposorory
+  block:
   - name: Ensurre gpg is installed
     apt:
       name: gpg
@@ -19,7 +24,13 @@
   - name: Add the apt reposotory
     ansible.builtin.apt_repository:
       repo: deb http://vo.ari.uni-heidelberg.de/debian release main
+  when: '"gavodachs2-server" not in ansible_facts.packages'
+  become: true
+  become_method: sudo
+  become_user: root
 
+- name: Install and add configuration
+  block:
   - name: Install gavodachs
     apt:
       name: gavodachs2-server
