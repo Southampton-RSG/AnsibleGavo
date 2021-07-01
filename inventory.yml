@@ -1,9 +1,0 @@
----
-# file: inventory.yml
-all:
-  children:
-    system:
-      host:
-        ip.ip.ip.ip
-      vars:
-        ansible_python_interpreter: /usr/bin/python3
