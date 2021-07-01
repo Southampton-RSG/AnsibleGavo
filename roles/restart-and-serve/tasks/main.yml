@@ -12,8 +12,8 @@
     ansible.builtin.systemd:
       name: gavo
       state: started
-      enabled: yes
-      daemon_reload: yes
-  become: yes
+      enabled: true
+      daemon_reload: true
+  become: true
   become_method: sudo
   become_user: root

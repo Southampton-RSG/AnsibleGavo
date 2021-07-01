@@ -1,0 +1,34 @@
+---
+- include_tasks:
+  - name: Make the data file
+    file:
+      path: "/var/gavo/inputs/{{ data_idx.data_name }}/data/"
+      state: directory
+
+  - name: Download Test Resource Descriptor
+    get_url:
+      url: "{{ data_idx.rd_url }}"
+      dest: "/var/gavo/inputs/{{ data_idx.data_name }}/q.rd"
+
+  - name: Test Resource Descriptor
+    assert:
+      that:
+        - "dachs test {{ data_idx.data_name }}/q"
+      fail_msg: "q.rd file for {{ data_idx.data_name }} failed test"
+
+  - name: Download test Data
+    get_url:
+      url: "{{ data_idx.data_url}}"
+      dest: "/var/gavo/inputs/{{ data_idx.data_name }}/data/data.txt.gz"
+      checksum: "{{ data_idx.data_checksum }}"
+
+  - name: Import Test Data
+    ansible.builtin.command: "{{loop_item}} {{data_idx.data_name}}/q"
+    with_items:
+      - dachs imp
+      - dachs limits
+    loop_control:
+      index_var: loop_item
+  become: true
+  become_method: sudo
+  become_user: dachsroot

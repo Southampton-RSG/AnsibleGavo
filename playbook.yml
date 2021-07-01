@@ -22,8 +22,18 @@
   become: true
   become_method: su
   become_user: root
+  tasks:
+  - name: Install gavo
+    include_role:
+      name: install-gavo
 
-  roles:
-    - install-gavo
-    - load-test-data
-    - restart-and-serve
+  - name: Import data
+    with_items: "{{ data_sources | dict2items }}"
+    include_role:
+      name: load-data
+    vars:
+      data_idx: "{{ item }}"
+
+  - name: run server
+    include_role:
+      name: restart-and-serve
