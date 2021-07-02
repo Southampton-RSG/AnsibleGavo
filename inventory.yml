@@ -1,0 +1,14 @@
+all:
+  children:
+    dev_group_name:
+      hosts:
+        #ip eg. 192.168.1.1
+      vars:
+        admin_user: username
+        ansible_python_interpreter: /usr/bin/python3
+    deploy_group_name:
+      hosts:
+        #ip
+      vars:
+        admin_user: username
+        ansible_python_interpreter: /usr/bin/python3

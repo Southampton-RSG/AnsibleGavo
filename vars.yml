@@ -1,0 +1,8 @@
+---
+data_sources:
+  # Test data containing the required fields
+  arihip:
+    data_name: arihip
+    rd_url: http://svn.ari.uni-heidelberg.de/svn/gavo/hdinputs/arihip/q.rd
+    data_url: http://dc.g-vo.org/arihip/q/cone/static
+    data_checksum: md5:b98e1b44a0fce4c86f85ddad937a23fb
