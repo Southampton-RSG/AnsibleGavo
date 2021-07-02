@@ -1,6 +1,6 @@
 ---
 - name: Install GavoDaCHS
-  hosts: localvm
+  hosts: isolvm
 
   vars_files:
     - vars.yml
@@ -17,7 +17,7 @@
   - name: Add user to sudoers
     lineinfile:
       path: /etc/sudoers
-      line: '{{ admin_user }} ALL=(ALL:ALL) ALL'
+      line: "{{ admin_user }} ALL=(ALL:ALL) ALL"
       state: present
   become: true
   become_method: su
@@ -28,11 +28,15 @@
       name: install-gavo
 
   - name: Import data
-    with_items: "{{ data_sources | dict2items }}"
     include_role:
       name: load-data
     vars:
-      data_idx: "{{ item }}"
+      data_name: "{{ item.data_name }}"
+      rd_url: "{{ item.rd_url }}"
+      data_url: "{{ item.data_url }}"
+      data_checksum: "md5:{{ item.checksum }}"
+    loop:
+      - "{{ data_sources.arihip }}"
 
   - name: run server
     include_role:
