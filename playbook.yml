@@ -1,6 +1,6 @@
 ---
 - name: Install GavoDaCHS
-  hosts: isolvm
+  hosts: dev_group_name
 
   vars_files:
     - vars.yml
