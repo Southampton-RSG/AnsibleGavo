@@ -1,0 +1,15 @@
+---
+all:
+  children:
+    localvm:
+      hosts:
+        192.168.98.21
+      vars:
+        admin_user: pgrylls
+        ansible_python_interpreter: /usr/bin/python3
+    isolvm:
+      hosts:
+        192.168.79.224
+      vars:
+        admin_user: pjg1c19
+        ansible_python_interpreter: /usr/bin/python3
