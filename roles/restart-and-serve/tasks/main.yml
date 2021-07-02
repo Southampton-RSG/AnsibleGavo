@@ -12,8 +12,16 @@
     ansible.builtin.systemd:
       name: gavo
       state: started
-      enabled: yes
-      daemon_reload: yes
-  become: yes
+      enabled: true
+      daemon_reload: true
+
+  - name: Allow connections on 8080
+    ansible.builtin.iptables:
+      chain: INPUT
+      protocol: tcp
+      destination_port: 8080
+      jump: ACCEPT
+
+  become: true
   become_method: sudo
   become_user: root
