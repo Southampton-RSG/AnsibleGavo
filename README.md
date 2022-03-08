@@ -12,7 +12,7 @@ For more information see https://docs.ansible.com/ansible/latest/installation_gu
 
 ### Steps to deploy
 
-Firstly we need a debian 11.x server with SSH and root permissions. 
+Firstly we need a debian 11.x server wQith SSH and root permissions. 
 
 Get the ip address for the debian server, and edit the inventory file `inventory.yml`
 change the ip address under hosts. 
