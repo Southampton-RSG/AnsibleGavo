@@ -10,11 +10,15 @@ The requirement to run this is ansible which can be installed using a virtual en
 
 ```python3 -m pip install ansible```
 
-For more information see https://docs.ansible.com/ansible/latest/installation_guide/index.html
+For more information see [the ansible docs](https://docs.ansible.com/ansible/latest/installation_guide/index.html).
 
 ### Steps to deploy
 
-Firstly we need a debian 11.x server wQith SSH and root permissions. 
+Firstly we need a debian 11.x server with SSH and root permissions. [Download Debian](https://www.debian.org/download).
+
+Create a branch to store local config changes.
+
+```git checkout -b my-branch```
 
 Get the ip address for the debian server, and edit the inventory file `inventory.yml`
 change the ip address under hosts. 

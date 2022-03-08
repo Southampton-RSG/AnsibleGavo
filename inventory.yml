@@ -2,9 +2,9 @@ all:
   children:
     dev_group_name:
       hosts:
-        #ip eg. 192.168.1.1
+        192.168.98.130
       vars:
-        admin_user: username
+        admin_user: pgrylls
         ansible_python_interpreter: /usr/bin/python3
     deploy_group_name:
       hosts:
