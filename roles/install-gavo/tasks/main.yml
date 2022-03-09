@@ -24,7 +24,11 @@
   - name: Add the apt reposotory
     ansible.builtin.apt_repository:
       repo: deb http://vo.ari.uni-heidelberg.de/debian release main
-  when: '"gavodachs2-server" not in ansible_facts.packages'
+
+  # once the default debian reposotory is up to 2.4 is then this can be uncommented to skip this task set, a vars
+  # variable to choose to enable this/pick the bleeding edge release may be good here also
+  # when: ("gavodachs2-server" not in ansible_facts['packages']) and (ansible_facts['os_family'] == 'Debian' and ansible_facts['distribution_major_version'] <= '10')
+  when: ("gavodachs2-server" not in ansible_facts['packages']) or (ansible_facts.packages['gavodachs2-server'][0].version != 2.4 )
   become: true
   become_method: sudo
   become_user: root
