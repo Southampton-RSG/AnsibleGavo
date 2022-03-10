@@ -1,0 +1,45 @@
+---
+# This file assumes a three drive configuration as so
+# I'm leaving this hardcoded for now but this could easily be abstracted using vars.yml
+# os-disk: holding the OS and the Gavo installation and user accounts and data
+# data: large disk for storing the postgresql data tables. Mounted at /data
+# nvme: small and fast drive for storing the postgresql index tables. Mounted at /nvme
+
+- name: Collect PostgreSQL version and extensions
+  become_method: sudo
+  become_user: postgres
+  community.postgresql.postgresql_info:
+    filter: ver*,ext*
+  register: postgresql_info
+
+- name: Print Postgres version
+  ansible.builtin.command: "echo {{ postgresql_info.version.major }}"
+
+- name: Set up postgresql table on appropiate disks
+  block:
+  - name: Drop the cluster
+    ansible.builtin.command: "sudo pg_dropcluster --stop {{ postgresql_info.version.major }} main"
+
+  - name: Create new dachs cluster
+    ansible.builtin.command: "sudo pg_createcluster -d /data/postgres/{{ postgresql_info.version.major }}/main --locale=C -e UNICODE --lc-collate=C --lc-ctype=C {{ postgresql_info.version.major }} main"
+
+  - name: Start the new postgres server
+    ansible.builtin.command: "sudo /etc/init.d/postgresql start"
+
+  - name: Create a new database
+    ansible.builtin.command: "sudo -u postgres createdb -T template0 --encoding=UTF-8 --locale=C gavo"
+#    community.postgresql.postgresql_db:
+#      name: gavo
+#      encoding: UTF-8
+#      template: template0
+#      lc_collate: C
+#      lc_ctype: C
+
+  - name: Reinitilise dachs to apply settings to new DB
+    ansible.builtin.command: "sudo -u dachsroot dachs init"
+
+  become: true
+  become_method: sudo
+  become_user: root
+
+

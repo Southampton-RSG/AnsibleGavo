@@ -5,6 +5,11 @@
 
 - name: Ensure gavodachs2-server is in the apt reposorory
   block:
+  - name: Ensure acl is installed
+    apt:
+      name: acl
+      state: present
+
   - name: Ensurre gpg is installed
     apt:
       name: gpg

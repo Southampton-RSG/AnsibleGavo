@@ -27,6 +27,10 @@
     include_role:
       name: install-gavo
 
+  - name: Configure Postgsql
+    include_role:
+      name: configure-db
+
   - name: Import data
     include_role:
       name: load-data
@@ -34,7 +38,8 @@
       data_name: "{{ item.data_name }}"
       rd_url: "{{ item.rd_url }}"
       data_url: "{{ item.data_url }}"
-      data_checksum: "md5:{{ item.checksum }}"
+      checksum_algorithm: "{{ item.checksum_algorithm }}"
+      data_checksum: "{{ item.data_checksum }}"
     loop:
       - "{{ data_sources.arihip }}"
 

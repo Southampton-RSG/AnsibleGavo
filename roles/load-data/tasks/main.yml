@@ -18,8 +18,7 @@
     ansible.builtin.get_url:
       url: "{{ data_url }}"
       dest: "/var/gavo/inputs/{{ data_name }}/data/data.txt.gz"
-      #checksum: "{{ checksum_algorithm }}:{{ data_checksum }}" # ansible is being difficult about this substitution...
-      checksum: md5:b98e1b44a0fce4c86f85ddad937a23fb
+      checksum: "{{ checksum_algorithm }}:{{ data_checksum }}"
       group: gavo
       owner: dachsroot
 
