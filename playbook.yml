@@ -10,9 +10,11 @@
   pre_tasks:
   - name: Install sudo
     apt:
-      name: sudo
-      state: present
-
+      pkg:
+        - sudo
+        - iptables
+        - acl
+        - gpg
 
   - name: Add user to sudoers
     lineinfile:

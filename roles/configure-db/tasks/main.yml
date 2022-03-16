@@ -21,10 +21,10 @@
     ansible.builtin.command: "sudo pg_dropcluster --stop {{ postgresql_info.version.major }} main"
 
   - name: Create new dachs cluster
-    ansible.builtin.command: "sudo pg_createcluster -d /data/postgres/{{ postgresql_info.version.major }}/main --locale=C -e UNICODE --lc-collate=C --lc-ctype=C {{ postgresql_info.version.major }} main"
+    ansible.builtin.command: "sudo pg_createcluster -d /data/postgres/{{ postgresql_info.version.major }}/main --locale=C -e UNICODE --lc-collate=C --lc-ctype=C --port=5432 {{ postgresql_info.version.major }} main"
 
   - name: Start the new postgres server
-    ansible.builtin.command: "sudo /etc/init.d/postgresql start"
+    ansible.builtin.command: "sudo systemctl start postgresql@{{ postgresql_info.version.major }}-main"
 
   - name: Create a new database
     ansible.builtin.command: "sudo -u postgres createdb -T template0 --encoding=UTF-8 --locale=C gavo"
@@ -34,7 +34,42 @@
 #      template: template0
 #      lc_collate: C
 #      lc_ctype: C
+  become: true
+  become_method: sudo
+  become_user: root
 
+
+- name: Recreate roles table
+  block:
+  - name: Rercreate dachsroot role
+    community.postgresql.postgresql_user:
+      db: gavo
+      name: dachsroot
+      role_attr_flags: SUPERUSER,CREATEROLE,CREATEDB
+
+  - name: Rercreate gavo role
+    community.postgresql.postgresql_user:
+      db: gavo
+      name: gavo
+
+  - name: Rercreate gavoadmin role
+    community.postgresql.postgresql_user:
+      db: gavo
+      name: gavoadmin
+      role_attr_flags: CREATEROLE
+
+  - name: Rercreate untrusted role
+    community.postgresql.postgresql_user:
+      db: gavo
+      name: untrusted
+
+  become: true
+  become_method: sudo
+  become_user: postgres
+
+
+- name: Reinitilise Dachs
+  block:
   - name: Reinitilise dachs to apply settings to new DB
     ansible.builtin.command: "sudo -u dachsroot dachs init"
 
