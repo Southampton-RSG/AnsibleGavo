@@ -26,18 +26,74 @@
   - name: Start the new postgres server
     ansible.builtin.command: "sudo systemctl start postgresql@{{ postgresql_info.version.major }}-main"
 
-  - name: Create a new database
-    ansible.builtin.command: "sudo -u postgres createdb -T template0 --encoding=UTF-8 --locale=C gavo"
-#    community.postgresql.postgresql_db:
-#      name: gavo
-#      encoding: UTF-8
-#      template: template0
-#      lc_collate: C
-#      lc_ctype: C
   become: true
   become_method: sudo
   become_user: root
 
+
+- name: creaate data directories
+  block:
+  - name: Create main data directory
+    ansible.builtin.file:
+      path: /data/postgresql_data
+      state: directory
+      owner: postgres
+
+  - name: Create fast data directory
+    ansible.builtin.file:
+      path: /nvme/postgresql_data
+      state: directory
+      owner: postgres
+
+  become: true
+  become_method: sudo
+  become_user: root
+
+
+- name: Create tablespaces
+  block:
+  - name: Create main data directory
+    ansible.builtin.file:
+      path: /data/postgresql_data
+      state: directory
+      owner: postgres
+
+  - name: Create fast data directory
+    ansible.builtin.file:
+      path: /nvme/postgresql_data
+      state: directory
+      owner: postgres
+
+  - name: create default tablespace
+    community.postgresql.postgresql_tablespace:
+      tablespace: default_tablespace
+      location: /data/postgresql_data/
+
+  - name: create default tablespace
+    community.postgresql.postgresql_tablespace:
+      tablespace: fast_tablespace
+      location: /nvme/postgresql_data/
+
+  become: true
+  become_method: sudo
+  become_user: postgres
+
+
+- name: Create a new database
+  block:
+  - name: Create gavo database
+    # ansible.builtin.command: "sudo -u postgres createdb -T template0 --encoding=UTF-8 --locale=C gavo"
+    community.postgresql.postgresql_db:
+      name: gavo
+      encoding: UTF-8
+      template: template0
+      lc_collate: C
+      lc_ctype: C
+      tablespace: default_tablespace
+
+  become: true
+  become_method: sudo
+  become_user: postgres
 
 - name: Recreate roles table
   block:
@@ -66,7 +122,6 @@
   become: true
   become_method: sudo
   become_user: postgres
-
 
 - name: Reinitilise Dachs
   block:
