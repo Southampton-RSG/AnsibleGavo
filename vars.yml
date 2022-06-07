@@ -7,3 +7,5 @@ data_sources:
     data_url: "http://dc.g-vo.org/arihip/q/cone/static/data.txt.gz"
     checksum_algorithm: "md5"
     data_checksum: "b98e1b44a0fce4c86f85ddad937a23fb"
+  gavodachs:
+    version: 2.6+dfsg-1
