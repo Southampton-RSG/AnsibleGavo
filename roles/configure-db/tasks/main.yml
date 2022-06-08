@@ -1,9 +1,11 @@
 ---
-# This file assumes a three drive configuration as so
-# I'm leaving this hardcoded for now but this could easily be abstracted using vars.yml
-# os-disk: holding the OS and the Gavo installation and user accounts and data
-# data: large disk for storing the postgresql data tables. Mounted at /data
-# nvme: small and fast drive for storing the postgresql index tables. Mounted at /nvme
+# This role is for configuring the PostgreSQL database for GAVO DaCHS.
+# In the current state, this role assumes a three disk configuration:
+# - os-disk: holds the OS, the GAVO DaCHS installation, user accounts, etc.
+# - data: large disk for storing the PostgreSQL data tables
+# - nvme: small, but fast, drive for storing the PostgreSQL index tables
+# The locations for these disks are hardcoded for now, and will be abstracted
+# later into vars.yml to better generalize the role/playbook.
 
 - name: Collect PostgreSQL version and extensions
   become_method: sudo
@@ -15,7 +17,7 @@
 - name: Print Postgres version
   ansible.builtin.command: "echo {{ postgresql_info.version.major }}"
 
-- name: Set up postgresql table on appropiate disks
+- name: Set up postgresql table on appropriate disks
   block:
   - name: Drop the cluster
     ansible.builtin.command: "sudo pg_dropcluster --stop {{ postgresql_info.version.major }} main"
@@ -30,8 +32,7 @@
   become_method: sudo
   become_user: root
 
-
-- name: creaate data directories
+- name: Create data directory
   block:
   - name: Create main data directory
     ansible.builtin.file:
@@ -81,8 +82,7 @@
 
 - name: Create a new database
   block:
-  - name: Create gavo database
-    # ansible.builtin.command: "sudo -u postgres createdb -T template0 --encoding=UTF-8 --locale=C gavo"
+  - name: Create GAVO database
     community.postgresql.postgresql_db:
       name: gavo
       encoding: UTF-8

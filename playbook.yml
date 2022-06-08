@@ -24,19 +24,17 @@
   become_user: root
 
   tasks:
-  - name: Install gavo
+  - name: Install GAVO DaCHS
     include_role:
       name: install-gavo
     vars:
         version: "{{ item.version }}"
-    loop:
-      - "{{ data_sources.gavodachs }}"
 
-  - name: Configure Postgsql
+  - name: Configure PostgreSQL
     include_role:
       name: configure-db
 
-  - name: Import data
+  - name: Import data into GAVO DaCHS
     include_role:
       name: load-data
     vars:
@@ -48,6 +46,6 @@
     loop:
       - "{{ data_sources.arihip }}"
 
-  - name: run server
+  - name: Run and serve GAVO DaCHS
     include_role:
       name: restart-and-serve
