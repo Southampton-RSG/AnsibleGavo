@@ -47,3 +47,13 @@
   become: true
   become_method: sudo
   become_user: root
+
+- name: Setup user resource descriptor
+  block:
+    - name: Make and write to userconfig.rd
+      template:
+        src: userconfig.rd.j2
+        dest: /var/gavo/etc/userconfig.rd
+  become: true
+  become_method: sudo
+  become_user: root

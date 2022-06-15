@@ -12,6 +12,7 @@
         - iptables
         - acl
         - gpg
+        - vim
 
   - name: Add user to sudoers
     lineinfile:
@@ -28,7 +29,7 @@
     include_role:
       name: install-gavo
     vars:
-        version: "{{ item.version }}"
+        version: "{{ data_sources.gavodachs.version }}"
 
   - name: Configure PostgreSQL
     include_role:

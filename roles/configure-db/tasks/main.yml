@@ -13,72 +13,51 @@
   community.postgresql.postgresql_info:
     filter: ver*,ext*
   register: postgresql_info
-
 - name: Print Postgres version
   ansible.builtin.command: "echo {{ postgresql_info.version.major }}"
-
 - name: Set up postgresql table on appropriate disks
   block:
   - name: Drop the cluster
     ansible.builtin.command: "sudo pg_dropcluster --stop {{ postgresql_info.version.major }} main"
-
   - name: Create new dachs cluster
     ansible.builtin.command: "sudo pg_createcluster -d /data/postgres/{{ postgresql_info.version.major }}/main --locale=C -e UNICODE --lc-collate=C --lc-ctype=C --port=5432 {{ postgresql_info.version.major }} main"
-
   - name: Start the new postgres server
     ansible.builtin.command: "sudo systemctl start postgresql@{{ postgresql_info.version.major }}-main"
-
   become: true
   become_method: sudo
   become_user: root
 
-- name: Create data directory
+- name: Create directories for tablespaces
   block:
-  - name: Create main data directory
+  - name: Create directory for data
     ansible.builtin.file:
-      path: /data/postgresql_data
+      path: "/data/pgdata-{{ postgresql_info.version.major }}"
       state: directory
       owner: postgres
-
-  - name: Create fast data directory
+      group: postgres
+  - name: Create directory for fast tablespace
     ansible.builtin.file:
-      path: /nvme/postgresql_data
+      path: "/nvme/pgdata-{{ postgresql_info.version.major }}"
       state: directory
       owner: postgres
-
+      group: postgres
   become: true
   become_method: sudo
   become_user: root
-
 
 - name: Create tablespaces
   block:
-  - name: Create main data directory
-    ansible.builtin.file:
-      path: /data/postgresql_data
-      state: directory
-      owner: postgres
-
-  - name: Create fast data directory
-    ansible.builtin.file:
-      path: /nvme/postgresql_data
-      state: directory
-      owner: postgres
-
-  - name: create default tablespace
+  - name: Create tablespace for storing data
     community.postgresql.postgresql_tablespace:
-      tablespace: default_tablespace
-      location: /data/postgresql_data/
-
-  - name: create default tablespace
+      tablespace: default_tb
+      location: "/data/pgdata-{{ postgresql_info.version.major }}"
+  - name: Creating tablespace for fast indexing
     community.postgresql.postgresql_tablespace:
-      tablespace: fast_tablespace
-      location: /nvme/postgresql_data/
-
+      tablespace: fast_tb
+      location: "/nvme/pgdata-{{ postgresql_info.version.major }}"
   become: true
   become_method: sudo
   become_user: postgres
-
 
 - name: Create a new database
   block:
@@ -89,8 +68,7 @@
       template: template0
       lc_collate: C
       lc_ctype: C
-      tablespace: default_tablespace
-
+      tablespace: default_tb
   become: true
   become_method: sudo
   become_user: postgres
@@ -102,22 +80,22 @@
       db: gavo
       name: dachsroot
       role_attr_flags: SUPERUSER,CREATEROLE,CREATEDB
-
   - name: Rercreate gavo role
     community.postgresql.postgresql_user:
       db: gavo
       name: gavo
-
   - name: Rercreate gavoadmin role
     community.postgresql.postgresql_user:
       db: gavo
       name: gavoadmin
       role_attr_flags: CREATEROLE
-
   - name: Rercreate untrusted role
     community.postgresql.postgresql_user:
       db: gavo
       name: untrusted
+  - name: Give perms to create index
+    community.postgresql.postgresql_query:
+      query: GRANT CREATE ON TABLESPACE fast_tb TO gavoadmin
 
   become: true
   become_method: sudo
@@ -127,9 +105,6 @@
   block:
   - name: Reinitilise dachs to apply settings to new DB
     ansible.builtin.command: "sudo -u dachsroot dachs init"
-
   become: true
   become_method: sudo
   become_user: root
-
-

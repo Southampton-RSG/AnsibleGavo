@@ -134,7 +134,9 @@
         Velocity "pmraLTP" "pmdeLTP" Error "err_pmraLTP" "err_pmdeLTP"
     </stc>
 
-    <index columns="mv"/>
+    <index columns="mv">
+      <FEED source="%#fastindex" />
+    </index>
 
     <column name="hipno" type="integer" ucd="meta.id;meta.main"
       tablehead="HIP id" verbLevel="1"

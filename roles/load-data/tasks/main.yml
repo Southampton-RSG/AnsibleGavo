@@ -8,8 +8,8 @@
       state: directory
 
   - name: Download Test Resource Descriptor
-    ansible.builtin.get_url:
-      url: "{{ rd_url }}"
+    ansible.builtin.copy:
+      src: ./q.rd
       dest: "/var/gavo/inputs/{{ data_name }}/q.rd"
       group: gavo
       owner: dachsroot
