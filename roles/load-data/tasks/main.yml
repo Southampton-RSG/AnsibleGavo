@@ -1,20 +1,20 @@
 ---
-- block:
-  - name: Make the data file
+# This role downloads and imports data into GAVO DaCHS. Each step is done as
+# root.
+
+- name: Download and import data into GAVO DaCHS
+  block:
+  - name: Create directory to store data for import
     ansible.builtin.file:
       path: "/var/gavo/inputs/{{ data_name }}/data/"
       group: gavo
       owner: dachsroot
       state: directory
-
-  - name: Download Test Resource Descriptor
-    ansible.builtin.copy:
-      src: ./q.rd
+  - name: Get the resource descriptor for the data
+    template:
+      src:  arihip_q.rd.j2
       dest: "/var/gavo/inputs/{{ data_name }}/q.rd"
-      group: gavo
-      owner: dachsroot
-
-  - name: Download test Data
+  - name: Get the data
     ansible.builtin.get_url:
       url: "{{ data_url }}"
       dest: "/var/gavo/inputs/{{ data_name }}/data/data.txt.gz"
@@ -29,14 +29,13 @@
   #      - "dachs test {{ data_name }}/q == 0"
   #    fail_msg: "q.rd file for {{ data_name }} failed test"
 
-  - name: Import Data
+  - name: Import the data into DaCHS
     ansible.builtin.command: "{{ loop_item }} {{ data_name }}/q"
     with_items:
       - dachs imp
       - dachs limits
     loop_control:
       loop_var: loop_item
-
   become: true
   become_method: sudo
   become_user: root

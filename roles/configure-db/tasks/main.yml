@@ -13,8 +13,7 @@
   community.postgresql.postgresql_info:
     filter: ver*,ext*
   register: postgresql_info
-- name: Print Postgres version
-  ansible.builtin.command: "echo {{ postgresql_info.version.major }}"
+
 - name: Set up postgresql table on appropriate disks
   block:
   - name: Drop the cluster
@@ -29,13 +28,13 @@
 
 - name: Create directories for tablespaces
   block:
-  - name: Create directory for data
+  - name: Create directory for data storage
     ansible.builtin.file:
       path: "/data/pgdata-{{ postgresql_info.version.major }}"
       state: directory
       owner: postgres
       group: postgres
-  - name: Create directory for fast tablespace
+  - name: Create directory for fast indexing
     ansible.builtin.file:
       path: "/nvme/pgdata-{{ postgresql_info.version.major }}"
       state: directory
@@ -45,7 +44,7 @@
   become_method: sudo
   become_user: root
 
-- name: Create tablespaces
+- name: Create the tablespaces
   block:
   - name: Create tablespace for storing data
     community.postgresql.postgresql_tablespace:
@@ -59,7 +58,7 @@
   become_method: sudo
   become_user: postgres
 
-- name: Create a new database
+- name: Create a new database and create database users
   block:
   - name: Create GAVO database
     community.postgresql.postgresql_db:
@@ -69,12 +68,6 @@
       lc_collate: C
       lc_ctype: C
       tablespace: default_tb
-  become: true
-  become_method: sudo
-  become_user: postgres
-
-- name: Recreate roles table
-  block:
   - name: Rercreate dachsroot role
     community.postgresql.postgresql_user:
       db: gavo
@@ -95,16 +88,16 @@
       name: untrusted
   - name: Give perms to create index
     community.postgresql.postgresql_query:
+      db: gavo
       query: GRANT CREATE ON TABLESPACE fast_tb TO gavoadmin
-
   become: true
   become_method: sudo
   become_user: postgres
 
-- name: Reinitilise Dachs
+- name: Re-initialize DaCHS
   block:
-  - name: Reinitilise dachs to apply settings to new DB
-    ansible.builtin.command: "sudo -u dachsroot dachs init"
+  - name: Re-initialize DaCHS to apply settings to new DB
+    ansible.builtin.command: "dachs init"
   become: true
   become_method: sudo
-  become_user: root
+  become_user: dachsroot
