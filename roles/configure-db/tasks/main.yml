@@ -14,19 +14,7 @@
     filter: ver*,ext*
   register: postgresql_info
 
-- name: Set up postgresql table on appropriate disks
-  block:
-  - name: Drop the cluster
-    ansible.builtin.command: "sudo pg_dropcluster --stop {{ postgresql_info.version.major }} main"
-  - name: Create new dachs cluster
-    ansible.builtin.command: "sudo pg_createcluster -d /data/postgres/{{ postgresql_info.version.major }}/main --locale=C -e UNICODE --lc-collate=C --lc-ctype=C --port=5432 {{ postgresql_info.version.major }} main"
-  - name: Start the new postgres server
-    ansible.builtin.command: "sudo systemctl start postgresql@{{ postgresql_info.version.major }}-main"
-  become: true
-  become_method: sudo
-  become_user: root
-
-- name: Create directories for tablespaces
+- name: Create directories for PostgreSQL tablespaces
   block:
   - name: Create directory for data storage
     ansible.builtin.file:
@@ -44,52 +32,33 @@
   become_method: sudo
   become_user: root
 
-- name: Create the tablespaces
+- name: Remove connected users from PostgreSQL
+  block:
+    - name: Stop the PostgreSQL service
+      ansible.builtin.service:
+        name: postgresql
+        state: stopped
+    - name: Restart the PostgreSQL service
+      ansible.builtin.service:
+        name: postgresql
+        state: started
+
+- name: Create the PostgreSQL tablespaces
   block:
   - name: Create tablespace for storing data
     community.postgresql.postgresql_tablespace:
       tablespace: default_tb
       location: "/data/pgdata-{{ postgresql_info.version.major }}"
+      owner: gavoadmin
   - name: Creating tablespace for fast indexing
     community.postgresql.postgresql_tablespace:
       tablespace: fast_tb
       location: "/nvme/pgdata-{{ postgresql_info.version.major }}"
-  become: true
-  become_method: sudo
-  become_user: postgres
-
-- name: Create a new database and create database users
-  block:
-  - name: Create GAVO database
+      owner: gavoadmin
+  - name: Change the default tablespace to the new one
     community.postgresql.postgresql_db:
       name: gavo
-      encoding: UTF-8
-      template: template0
-      lc_collate: C
-      lc_ctype: C
       tablespace: default_tb
-  - name: Rercreate dachsroot role
-    community.postgresql.postgresql_user:
-      db: gavo
-      name: dachsroot
-      role_attr_flags: SUPERUSER,CREATEROLE,CREATEDB
-  - name: Rercreate gavo role
-    community.postgresql.postgresql_user:
-      db: gavo
-      name: gavo
-  - name: Rercreate gavoadmin role
-    community.postgresql.postgresql_user:
-      db: gavo
-      name: gavoadmin
-      role_attr_flags: CREATEROLE
-  - name: Rercreate untrusted role
-    community.postgresql.postgresql_user:
-      db: gavo
-      name: untrusted
-  - name: Give perms to create index
-    community.postgresql.postgresql_query:
-      db: gavo
-      query: GRANT CREATE ON TABLESPACE fast_tb TO gavoadmin
   become: true
   become_method: sudo
   become_user: postgres
