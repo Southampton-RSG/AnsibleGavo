@@ -1,43 +1,57 @@
 ---
-- name: Install GavoDaCHS
-  hosts: isolvm
+# The purpose of this playbook is to automate the installation and configuration
+# of GAVO DaCHS for more exotic PostgreSQL table space configurations.
+# It is targeting a model where:
+# - the OS disk is used for the OS, the GAVO DaCHS installation, users, etc;
+# - the data (located /data) disk is used for storing PostgreSQL data tables;
+# - the nvme (located /nvme) disk is used for storing PostgreSQL index tables.
+# The locations for these disks are hardcoded for now, but will be abstracted
+# later down the line.
 
+- name: The "easy" way to install, configure and import data into GAVO DaCHS
+  hosts: dev_group_name
   vars_files:
     - vars.yml
-
   remote_user: "{{ admin_user }}"
-
   pre_tasks:
-  - name: Install sudo
-    apt:
-      name: sudo
-      state: present
-
-
-  - name: Add user to sudoers
-    lineinfile:
-      path: /etc/sudoers
-      line: "{{ admin_user }} ALL=(ALL:ALL) ALL"
-      state: present
+    - name: Install sudo and other packages
+      apt:
+        pkg:
+          - sudo
+          - iptables
+          - acl
+          - gpg
+          - vim
+    - name: "Add admin user ({{ admin_user }}) to list of sudoers"
+      lineinfile:
+        path: /etc/sudoers
+        line: "{{ admin_user }} ALL=(ALL:ALL) ALL"
+        state: present
   become: true
   become_method: su
   become_user: root
+
   tasks:
-  - name: Install gavo
+  - name: Install GAVO DaCHS from aptitude
     include_role:
       name: install-gavo
+    vars:
+        version: "{{ configuration.gavodachs.version }}"
 
-  - name: Import data
+  - name: Configure PostgreSQL database for use with GAVO DaCHS
+    include_role:
+      name: configure-db
+
+  - name: Import data into GAVO DaCHS
     include_role:
       name: load-data
     vars:
-      data_name: "{{ item.data_name }}"
-      rd_url: "{{ item.rd_url }}"
-      data_url: "{{ item.data_url }}"
-      data_checksum: "md5:{{ item.checksum }}"
-    loop:
-      - "{{ data_sources.arihip }}"
+      data_name: "{{ data_sources.arihip.data_name }}"
+      rd_url: "{{ data_sources.arihip.rd_url }}"
+      data_url: "{{ data_sources.arihip.data_url }}"
+      checksum_algorithm: "{{ data_sources.arihip.checksum_algorithm }}"
+      data_checksum: "{{ data_sources.arihip.data_checksum }}"
 
-  - name: run server
+  - name: Run and serve GAVO DaCHS
     include_role:
       name: restart-and-serve

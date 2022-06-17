@@ -1,1 +1,6 @@
 .idea
+TestData/
+.DS_Store
+dachs-deploy/
+env/
+roles/.DS_Store

@@ -1,0 +1,72 @@
+---
+# This role is for configuring the PostgreSQL database for GAVO DaCHS.
+# In the current state, this role assumes a three disk configuration:
+# - os-disk: holds the OS, the GAVO DaCHS installation, user accounts, etc.
+# - data: large disk for storing the PostgreSQL data tables
+# - nvme: small, but fast, drive for storing the PostgreSQL index tables
+# The locations for these disks are hardcoded for now, and will be abstracted
+# later into vars.yml to better generalize the role/playbook.
+
+- name: Collect PostgreSQL version and extensions
+  become_method: sudo
+  become_user: postgres
+  community.postgresql.postgresql_info:
+    filter: ver*,ext*
+  register: postgresql_info
+
+- name: Create directories for PostgreSQL tablespaces
+  block:
+  - name: Create directory for data storage
+    ansible.builtin.file:
+      path: "/data/pgdata-{{ postgresql_info.version.major }}"
+      state: directory
+      owner: postgres
+      group: postgres
+  - name: Create directory for fast indexing
+    ansible.builtin.file:
+      path: "/nvme/pgdata-{{ postgresql_info.version.major }}"
+      state: directory
+      owner: postgres
+      group: postgres
+  become: true
+  become_method: sudo
+  become_user: root
+
+- name: Remove connected users from PostgreSQL
+  block:
+    - name: Stop the PostgreSQL service
+      ansible.builtin.service:
+        name: postgresql
+        state: stopped
+    - name: Restart the PostgreSQL service
+      ansible.builtin.service:
+        name: postgresql
+        state: started
+
+- name: Create the PostgreSQL tablespaces
+  block:
+  - name: Create tablespace for storing data
+    community.postgresql.postgresql_tablespace:
+      tablespace: default_tb
+      location: "/data/pgdata-{{ postgresql_info.version.major }}"
+      owner: gavoadmin
+  - name: Creating tablespace for fast indexing
+    community.postgresql.postgresql_tablespace:
+      tablespace: fast_tb
+      location: "/nvme/pgdata-{{ postgresql_info.version.major }}"
+      owner: gavoadmin
+  - name: Change the default tablespace to the new one
+    community.postgresql.postgresql_db:
+      name: gavo
+      tablespace: default_tb
+  become: true
+  become_method: sudo
+  become_user: postgres
+
+- name: Re-initialize DaCHS
+  block:
+  - name: Re-initialize DaCHS to apply settings to new DB
+    ansible.builtin.command: "dachs init"
+  become: true
+  become_method: sudo
+  become_user: dachsroot

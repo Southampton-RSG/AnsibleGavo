@@ -1,27 +1,26 @@
 ---
-- block:
-  - name: Stop server
-    command: /etc/init.d/dachs stop
+# This role will kill the currently running GAVO DaCHS server, send the
+# configuration file to the correct place and then restart the server to serve
+# the DaCHS service.
 
-  - name: Setup Dachs server
+- name: Restart the GAVO DaCHS service and serve the service
+  block:
+  - name: Stop the GAVO DaCHS service from running
+    ansible.builtin.service:
+      name: dachs
+      state: stopped
+  - name: Setup GAVO DaCHS server configuration
     template:
       src: gavo-service.j2
       dest: /etc/systemd/system/gavo.service
-
-  - name: Start server
-    ansible.builtin.systemd:
-      name: gavo
-      state: started
-      enabled: true
-      daemon_reload: true
-
+  - name: Serve the GAVO DaCHS server
+    ansible.builtin.command: sudo -u dachsroot dachs serve start
   - name: Allow connections on 8080
     ansible.builtin.iptables:
       chain: INPUT
       protocol: tcp
       destination_port: 8080
       jump: ACCEPT
-
   become: true
   become_method: sudo
   become_user: root

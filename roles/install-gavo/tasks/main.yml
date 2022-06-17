@@ -1,45 +1,59 @@
 ---
+# This role will install GAVO DaCHS to the version specified in the vars.yml
+# file. The following things are done:
+#   - Get the currently installed packages
+#   - If the GAVO DaCHS is not installed or if an installed version is different,
+#     then the following things are done:
+#     - Add the GAVO DaCHS apt key to apt
+#     - Install the specified version of GAVO DaCHS
+#   - Copy the GAVO DaCHS configuration file to the correct location
+
 - name: Gather package facts
   ansible.builtin.package_facts:
     manager: apt
 
-- name: Ensure gavodachs2-server is in the apt reposorory
+- name: Install GAVO DaCHS 2 server from apt
   block:
-  - name: Ensurre gpg is installed
-    apt:
-      name: gpg
-      state: present
-
   - name: Make the apt key file
     file:
       path: /etc/apt/trusted.gpg.d/gavo-archive.key.asc
       state: touch
-
   - name: Add the apt key to file
     ansible.builtin.apt_key:
       id: D8C139FC
       url: https://docs.g-vo.org/archive-key.asc
       keyring: /etc/apt/trusted.gpg.d/gavo-archive.key.asc
-
-  - name: Add the apt reposotory
+  - name: Add the apt repository
     ansible.builtin.apt_repository:
       repo: deb http://vo.ari.uni-heidelberg.de/debian release main
-  when: '"gavodachs2-server" not in ansible_facts.packages'
+      update_cache: yes
+  - name: Install GAVO DaCHS 2 server
+    apt:
+      name: gavodachs2-server={{ version }}
+      update_cache: yes
+      allow_downgrade: yes
+  when: "'gavodachs2-server' not in ansible_facts.packages
+    or ansible_facts.packages['gavodachs2-server'][0].version != version"
   become: true
   become_method: sudo
   become_user: root
 
-- name: Install and add configuration
+- name: Create the GAVO DaCHS configuration file
   block:
-  - name: Install gavodachs
-    apt:
-      name: gavodachs2-server
-      state: present
-
   - name: Make and write to gavo.rc
     template:
       src: gavo.rc.j2
       dest: /etc/gavo.rc
+  become: true
+  become_method: sudo
+  become_user: root
+
+- name: Setup user resource descriptor
+  block:
+    - name: Make and write to userconfig.rd
+      template:
+        src: userconfig.rd.j2
+        dest: /var/gavo/etc/userconfig.rd
   become: true
   become_method: sudo
   become_user: root
