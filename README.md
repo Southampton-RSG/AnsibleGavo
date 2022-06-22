@@ -12,7 +12,7 @@ This playbook assumes that GAVO DaCHS will use two table spaces,
 Ansible will take care of creating the tablespaces in the appropriate locations
 and will import and serve the data.
 
-### Requirements
+## Requirements
 
 Ansible is required, which can be installed using a python venv like so:
 
@@ -22,7 +22,7 @@ Ansible is required, which can be installed using a python venv like so:
 
 For more information see [the ansible docs](https://docs.ansible.com/ansible/latest/installation_guide/index.html).
 
-### Steps to deploy
+## Steps to deploy
 
 Firstly, we need a debian 11.x server with SSH and root permissions. Download
 Debian from [here](https://www.debian.org/download) and check out the
@@ -51,6 +51,29 @@ The following Ansible command will install, configure and
 
 If the SSH connection is refused, try to SSH into the server from the computer
 you are running the deployment script from.
+
+### Variables required
+
+There are a number of variables located in `vars.yml` which are used to control
+the version of GAVO DaCHS, how it is deployed and the data which will be served.
+
+| Variable | Description |
+| -------- | ----------- |
+| source_name | The name of the data source used as the name in `/var/gavo/inputs`, e.g. arihip |
+| rd_url | A URL to download the resource descriptor |
+| rd_name | The name to use for the resource descriptor |
+| data_url | A URL to download the data to serve |
+| data_name | The name of the data file |
+| checksum_algorithm | The type of checksum algorithm to use to verify the downloaded data |
+| data_checksum | The checksum hash to validate against |
+| version | The version of `gavodachs2-server` to install, see `apt search gavodachs2-server` if unsure of the version |
+| fast_tb_location | The location on disk where the fast index table should be |
+| default_tb_location | The location on disk where the mass storage table should be |
+| fast_tb_feedname | A nickname to give to the fast table for use internally in the resource descriptor and userconfig |
+| run_tests | A boolean to indicate if resource descriptor regression tests should be run or not |
+| bind_address | The bind address for PostgreSQL |
+| site_name | The name of the site to be served by GAVO DaCHS |
+
 
 ## Development
 
