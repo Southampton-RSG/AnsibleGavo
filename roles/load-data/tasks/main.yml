@@ -6,37 +6,34 @@
   block:
   - name: Create directory to store data for import
     ansible.builtin.file:
-      path: "/var/gavo/inputs/{{ data_name }}/data/"
+      path: "/var/gavo/inputs/{{ source_name }}/data/"
       group: gavo
       owner: dachsroot
       state: directory
-  - name: Get the resource descriptor for the data
-    template:
-      src:  arihip_q.rd.j2
-      dest: "/var/gavo/inputs/{{ data_name }}/q.rd"
   - name: Get the data
     ansible.builtin.get_url:
       url: "{{ data_url }}"
-      dest: "/var/gavo/inputs/{{ data_name }}/data/data.txt.gz"
+      dest: "/var/gavo/inputs/{{ source_name }}/data/{{ data_name }}"
       checksum: "{{ checksum_algorithm }}:{{ data_checksum }}"
       group: gavo
       owner: dachsroot
-
-  # TODO: Not strictly necessary but would be good to get working for completeness
-  #- name: Test Resource Descriptor
-  #  assert:
-  #    that:
-  #      - "dachs test {{ data_name }}/q == 0"
-  #    fail_msg: "q.rd file for {{ data_name }} failed test"
-
+  - name: Get the resource descriptor for the data
+    ansible.builtin.get_url:
+      url: "{{ rd_url }}"
+      dest: "/var/gavo/inputs/{{ source_name }}/{{ rd_name }}.rd"
+      group: gavo
+      owner: dachsroot
   - name: Import the data into DaCHS
-    ansible.builtin.command: "{{ loop_item }} {{ data_name }}/q"
+    ansible.builtin.command: "{{ command }} {{ source_name }}/q"
     with_items:
       - dachs imp
       - dachs limits
-      # - dachs pub
+      - dachs pub
     loop_control:
-      loop_var: loop_item
+      loop_var: command
+  - name: Run the resource descriptor regression tests
+    ansible.builtin.command: "dachs test {{ source_name }}/{{ rd_name }}"
+    when: "run_tests == true"
   become: true
   become_method: sudo
   become_user: root

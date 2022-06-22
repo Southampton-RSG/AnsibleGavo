@@ -1,9 +1,16 @@
 # Deploy GAVO DaCHS with Ansible
 
-The aim of this repository is to provide a reproducible deployment of a GAVO
-DaCHS server. This deployment is done with Ansible, and assumes that data will
-be stored on a dedicated hard disk whilst the index will be stored on a fast
-NVME drive.
+The aim of this Ansible playbook is to provide a reproducible method for
+deploying a new instance of a GAVO DaCHS server using a more exotic tablespace
+set up.
+
+This playbook assumes that GAVO DaCHS will use two table spaces,
+
+- A "slow" tablespace for mass storage of data
+- A "fast" tablespace (e.g. located on an NVMe) for indexes
+
+Ansible will take care of creating the tablespaces in the appropriate locations
+and will import and serve the data.
 
 ### Requirements
 
@@ -31,8 +38,14 @@ Get the IP address for the debian server, and edit the inventory file
 `admin_user` field to the username that used to SSH into the system. This user
 will be added to the list of sudoers on the server.
 
-The following Ansible command will then install, configure and
-`gavodachs2-server` and import test data:
+A number of variables needs to be set in `vars.yml` to configure the deployment
+of GACH DaCHS. The data to be served and its associated meta files, such as
+resource descriptor, are expected to be stored on some remote host which
+Ansible can access to download onto the machines where GAVO DaCHS is being
+deployed to.
+
+The following Ansible command will install, configure and
+`gavodachs2-server` and import your data:
 
 ```ansible-playbook playbook.yml -i inventory.yml -Kk --ask-become-pass```
 

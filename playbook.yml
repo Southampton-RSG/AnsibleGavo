@@ -22,6 +22,7 @@
           - acl
           - gpg
           - vim
+          - curl
     - name: "Add admin user ({{ admin_user }}) to list of sudoers"
       lineinfile:
         path: /etc/sudoers
@@ -32,25 +33,35 @@
   become_user: root
 
   tasks:
-  - name: Install GAVO DaCHS from aptitude
+  - name: Install GAVO DaCHS from the package manager
     include_role:
       name: install-gavo
     vars:
-        version: "{{ configuration.gavodachs.version }}"
+        version: "{{ gavo.version }}"
+        fast_tb_feedname: "{{ gavo.fast_tb_feedname }}"
+        run_tests: "{{ gavo.run_tests }}"
+        bind_address: "{{ site.bind_address }}"
+        site_name: "{{ site.site_name }}"
 
   - name: Configure PostgreSQL database for use with GAVO DaCHS
     include_role:
       name: configure-db
+    vars:
+      fast_tb_location: "{{ gavo.fast_tb_location }}"
+      default_tb_location: "{{ gavo.default_tb_location }}"
 
   - name: Import data into GAVO DaCHS
     include_role:
       name: load-data
     vars:
-      data_name: "{{ data_sources.arihip.data_name }}"
-      rd_url: "{{ data_sources.arihip.rd_url }}"
-      data_url: "{{ data_sources.arihip.data_url }}"
-      checksum_algorithm: "{{ data_sources.arihip.checksum_algorithm }}"
-      data_checksum: "{{ data_sources.arihip.data_checksum }}"
+      source_name: "{{ data.source_name }}"
+      rd_url: "{{ data.rd_url }}"
+      rd_name: "{{ data.rd_name }}"
+      data_url: "{{ data.data_url }}"
+      data_name: "{{ data.data_name }}"
+      checksum_algorithm: "{{ data.checksum_algorithm }}"
+      data_checksum: "{{ data.data_checksum }}"
+      run_tests: "{{ gavo.run_tests }}"
 
   - name: Run and serve GAVO DaCHS
     include_role:
