@@ -5,6 +5,8 @@
 
 - name: Restart the GAVO DaCHS service and serve the service
   block:
+  - name: Stop serving the GAVO DaCHS server
+    ansible.builtin.command: sudo -u dachsroot dachs serve stop
   - name: Stop the GAVO DaCHS service from running
     ansible.builtin.service:
       name: dachs
