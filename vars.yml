@@ -3,10 +3,8 @@
 # Variables for controlling the data imported into GAVO DaCHS
 data:
   source_name: arihip
-  # rd_url: "https://raw.githubusercontent.com/EdwardRSE/AnsibleGavoDataExample/main/q.rd"
-  rd_url: "http://svn.ari.uni-heidelberg.de/svn/gavo/hdinputs/arihip/q.rd"
+  rd_url: "https://raw.githubusercontent.com/EdwardRSE/AnsibleGavoDataExample/main/q.rd"
   rd_name: "q"
-  # data_url: "https://github.com/EdwardRSE/AnsibleGavoDataExample/blob/main/data.txt.gz?raw=true"
   data_url: "https://github.com/EdwardRSE/AnsibleGavoDataExample/blob/main/data.txt.gz?raw=true"
   data_name: "data.txt.gz"
   checksum_algorithm: "md5"
