@@ -40,6 +40,7 @@
         version: "{{ gavo.version }}"
         fast_tb_feedname: "{{ gavo.fast_tb_feedname }}"
         run_tests: "{{ gavo.run_tests }}"
+        authority: "{{ gavo.authority }}"
         bind_address: "{{ site.bind_address }}"
         site_name: "{{ site.site_name }}"
 

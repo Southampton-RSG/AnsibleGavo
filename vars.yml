@@ -17,6 +17,7 @@ gavo:
   default_tb_location: /data
   fast_tb_feedname: fastindex
   run_tests: true
+  authority: soton.astrodb
 
 # Variables to control site deployment
 site:

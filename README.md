@@ -71,6 +71,7 @@ the version of GAVO DaCHS, how it is deployed and the data which will be served.
 | default_tb_location | The location on disk where the mass storage table should be |
 | fast_tb_feedname | A nickname to give to the fast table for use internally in the resource descriptor and userconfig |
 | run_tests | A boolean to indicate if resource descriptor regression tests should be run or not |
+| authority | A unique identifier for your own services in the VO |
 | bind_address | The bind address for PostgreSQL |
 | site_name | The name of the site to be served by GAVO DaCHS |
 
