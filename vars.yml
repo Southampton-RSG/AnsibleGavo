@@ -1,15 +1,25 @@
 ---
+
 # Variables for controlling the data imported into GAVO DaCHS
-data_sources:
-  # Test data containing the required fields
-  arihip:
-    data_name: arihip
-    rd_url: "./q.rd"
-    data_url: "http://dc.g-vo.org/arihip/q/cone/static/data.txt.gz"
-    checksum_algorithm: "md5"
-    data_checksum: "b98e1b44a0fce4c86f85ddad937a23fb"
+data:
+  source_name: arihip
+  rd_url: "https://raw.githubusercontent.com/EdwardRSE/AnsibleGavoDataExample/main/q.rd"
+  rd_name: "q"
+  data_url: "https://github.com/EdwardRSE/AnsibleGavoDataExample/blob/main/data.txt.gz?raw=true"
+  data_name: "data.txt.gz"
+  checksum_algorithm: "md5"
+  data_checksum: "b98e1b44a0fce4c86f85ddad937a23fb"
 
 # Variables for controlling the installation of GAVO DaCHS and its configuration
-configuration:
-  gavodachs:
-    version: 2.6+dfsg-1
+gavo:
+  version: 2.6+dfsg-1
+  fast_tb_location: /nvme
+  default_tb_location: /data
+  fast_tb_feedname: fastindex
+  run_tests: true
+  authority: soton.astrodb
+
+# Variables to control site deployment
+site:
+  bind_address: 0.0.0.0
+  site_name: AstroDB
