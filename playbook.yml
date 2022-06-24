@@ -40,9 +40,17 @@
         version: "{{ gavo.version }}"
         fast_tb_feedname: "{{ gavo.fast_tb_feedname }}"
         run_tests: "{{ gavo.run_tests }}"
-        authority: "{{ gavo.authority }}"
+        authority: "{{ meta.authority }}"
+        authority_shortname: "{{ meta.authority_shortname }}"
         bind_address: "{{ site.bind_address }}"
         site_name: "{{ site.site_name }}"
+        publisher: "{{ meta.publisher }}"
+        contact_name: "{{ meta.contact_name }}"
+        contact_address: "{{ meta.contact_address }}"
+        contact_email: "{{ meta.contact_email }}"
+        no_result_warning: "{{ meta.no_result_warning }}"
+        site_description: "{{ meta.site_description }}"
+        creation_date: "{{ meta.creation_date }}"
 
   - name: Configure PostgreSQL database for use with GAVO DaCHS
     include_role:

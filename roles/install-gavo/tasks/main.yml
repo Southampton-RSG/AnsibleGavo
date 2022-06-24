@@ -44,6 +44,10 @@
     template:
       src: gavo.rc.j2
       dest: /etc/gavo.rc
+  - name: Make and write defaultmeta.txt
+    template:
+      src: defaultmeta.txt.j2
+      dest: /var/gavo/etc/defaultmeta.txt
   become: true
   become_method: sudo
   become_user: root
