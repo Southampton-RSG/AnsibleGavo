@@ -1,36 +1,39 @@
 ---
 
-# Variables for controlling the data imported into GAVO DaCHS
-data:
-  source_name: arihip
-  rd_url: "https://raw.githubusercontent.com/EdwardRSE/AnsibleGavoDataExample/main/q.rd"
+# Variables for controlling the data ingested into GAVO DaCHS
+data_source:
+  root_directory: help_a_list
+  rd_url: "https://raw.githubusercontent.com/EdwardRSE/DaCHS-Resource-Descriptors/main/help_a_list.rd?token=GHSAT0AAAAAABVPWE5PAK6SBPQ32WJZIL7OYV5WY7A"
   rd_name: "q"
-  data_url: "https://github.com/EdwardRSE/AnsibleGavoDataExample/blob/main/data.txt.gz?raw=true"
-  data_name: "data.txt.gz"
-  checksum_algorithm: "md5"
-  data_checksum: "b98e1b44a0fce4c86f85ddad937a23fb"
+  data_url: "http://hedam.lam.fr/HELP/dataproducts/dmu32/dmu32_AllSky/data/vo/AKARI-NEP_best_phot_20201111.fits.csv"
+  data_directory: "data/main"
+  data_name: "AKARI-NEP_best_phot_20201111.fits.csv"
+  checksum: ""
+  run_rd_tests: false
 
 # Variables for controlling the installation of GAVO DaCHS and its configuration
-gavo:
+gavo_dachs_info:
   version: 2.6+dfsg-1
   fast_tb_location: /nvme
   default_tb_location: /data
   fast_tb_feedname: fastindex
-  run_tests: true
 
-# Variables to control site deployment
-site:
+# Variables for site deployment
+site_details:
   bind_address: 0.0.0.0
-  site_name: AstroDB
+  site_name: Soton-AstroDB
 
-# Variables for setting the site metadata
-meta:
+# Variables for site metadata
+meta_details:
+  # Authority required for publishing services
+  authority: soton.astrodb
+  authority_shortname: soton.astrodb
+  # Various pieces of metadata about the website and maintainer, can be left as
+  # placeholder if kept internal
   publisher: University of Southampton
   contact_name: University of Southampton
   contact_address: University of Southampton, Southampton, SO17 1BJ
   contact_email: uni@soton.ac.uk
   no_result_warning: Your query did not match any data.
-  authority: soton.astrodb
-  authority_shortname: soton.astrodb
+  creation_date: "2022-06-24T00:00:00`"
   site_description: This is a terse description of the site.
-  creation_date: "2022-06-24T11:13:45"
