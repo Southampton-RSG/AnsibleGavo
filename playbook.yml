@@ -37,32 +37,39 @@
     include_role:
       name: install-gavo
     vars:
-        version: "{{ gavo.version }}"
-        fast_tb_feedname: "{{ gavo.fast_tb_feedname }}"
-        run_tests: "{{ gavo.run_tests }}"
-        authority: "{{ gavo.authority }}"
-        bind_address: "{{ site.bind_address }}"
-        site_name: "{{ site.site_name }}"
+        version: "{{ gavo_dachs_info.version }}"
+        fast_tb_feedname: "{{ gavo_dachs_info.fast_tb_feedname }}"
+        run_tests: "{{ data_source.run_tests }}"
+        authority: "{{ meta_details.authority }}"
+        authority_shortname: "{{ meta_details.authority_shortname }}"
+        bind_address: "{{ site_details.bind_address }}"
+        site_name: "{{ site_details.site_name }}"
+        publisher: "{{ meta_details.publisher }}"
+        contact_name: "{{ meta_details.contact_name }}"
+        contact_address: "{{ meta_details.contact_address }}"
+        contact_email: "{{ meta_details.contact_email }}"
+        site_description: "{{ meta_details.site_description }}"
+        creation_date: "{{ meta_details.creation_date }}"
 
   - name: Configure PostgreSQL database for use with GAVO DaCHS
     include_role:
       name: configure-db
     vars:
-      fast_tb_location: "{{ gavo.fast_tb_location }}"
-      default_tb_location: "{{ gavo.default_tb_location }}"
+      fast_tb_location: "{{ gavo_dachs_info.fast_tb_location }}"
+      default_tb_location: "{{ gavo_dachs_info.default_tb_location }}"
 
   - name: Import data into GAVO DaCHS
     include_role:
       name: load-data
     vars:
-      source_name: "{{ data.source_name }}"
-      rd_url: "{{ data.rd_url }}"
-      rd_name: "{{ data.rd_name }}"
-      data_url: "{{ data.data_url }}"
-      data_name: "{{ data.data_name }}"
-      checksum_algorithm: "{{ data.checksum_algorithm }}"
-      data_checksum: "{{ data.data_checksum }}"
-      run_tests: "{{ gavo.run_tests }}"
+      root_directory: "{{ data_source.root_directory }}"
+      rd_url: "{{ data_source.rd_url }}"
+      rd_name: "{{ data_source.rd_name }}"
+      data_url: "{{ data_source.data_url }}"
+      data_directory: "{{ data_source.data_directory }}"
+      data_name: "{{ data_source.data_name }}"
+      checksum: "{{ data_source.checksum }}"
+      run_tests: "{{ data_source.run_rd_tests }}"
 
   - name: Run and serve GAVO DaCHS
     include_role:

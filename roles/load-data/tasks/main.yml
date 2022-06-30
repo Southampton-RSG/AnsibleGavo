@@ -6,25 +6,25 @@
   block:
   - name: Create directory to store data for import
     ansible.builtin.file:
-      path: "/var/gavo/inputs/{{ source_name }}/data/"
+      path: "/var/gavo/inputs/{{ root_directory }}/{{ data_directory }}"
       group: gavo
       owner: dachsroot
       state: directory
   - name: Get the data
     ansible.builtin.get_url:
       url: "{{ data_url }}"
-      dest: "/var/gavo/inputs/{{ source_name }}/data/{{ data_name }}"
-      checksum: "{{ checksum_algorithm }}:{{ data_checksum }}"
+      dest: "/var/gavo/inputs/{{ root_directory }}/{{ data_directory }}/{{ data_name }}"
+      checksum: "{{ checksum }}"
       group: gavo
       owner: dachsroot
   - name: Get the resource descriptor for the data
     ansible.builtin.get_url:
       url: "{{ rd_url }}"
-      dest: "/var/gavo/inputs/{{ source_name }}/{{ rd_name }}.rd"
+      dest: "/var/gavo/inputs/{{ root_directory }}/{{ rd_name }}.rd"
       group: gavo
       owner: dachsroot
   - name: Import the data into DaCHS
-    ansible.builtin.command: "{{ command }} {{ source_name }}/q"
+    ansible.builtin.command: "{{ command }} {{ root_directory }}/{{ rd_name }}"
     with_items:
       - dachs imp
       - dachs limits
@@ -32,7 +32,7 @@
     loop_control:
       loop_var: command
   - name: Run the resource descriptor regression tests
-    ansible.builtin.command: "dachs test {{ source_name }}/{{ rd_name }}"
+    ansible.builtin.command: "dachs test {{ root_directory }}/{{ rd_name }}"
     when: "run_tests == true"
   become: true
   become_method: sudo
