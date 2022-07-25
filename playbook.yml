@@ -29,7 +29,7 @@
         line: "{{ admin_user }} ALL=(ALL:ALL) ALL"
         state: present
   become: true
-  become_method: su
+  become_method: sudo
   become_user: root
 
   tasks:
@@ -58,18 +58,18 @@
       fast_tb_location: "{{ gavo_dachs_info.fast_tb_location }}"
       default_tb_location: "{{ gavo_dachs_info.default_tb_location }}"
 
-  - name: Import data into GAVO DaCHS
-    include_role:
-      name: load-data
-    vars:
-      root_directory: "{{ data_source.root_directory }}"
-      rd_url: "{{ data_source.rd_url }}"
-      rd_name: "{{ data_source.rd_name }}"
-      data_url: "{{ data_source.data_url }}"
-      data_directory: "{{ data_source.data_directory }}"
-      data_name: "{{ data_source.data_name }}"
-      checksum: "{{ data_source.checksum }}"
-      run_tests: "{{ data_source.run_rd_tests }}"
+  # - name: Import data into GAVO DaCHS
+  #   include_role:
+  #     name: load-data
+  #   vars:
+  #     root_directory: "{{ data_source.root_directory }}"
+  #     rd_url: "{{ data_source.rd_url }}"
+  #     rd_name: "{{ data_source.rd_name }}"
+  #     data_url: "{{ data_source.data_url }}"
+  #     data_directory: "{{ data_source.data_directory }}"
+  #     data_name: "{{ data_source.data_name }}"
+  #     checksum: "{{ data_source.checksum }}"
+  #     run_tests: "{{ data_source.run_rd_tests }}"
 
   - name: Run and serve GAVO DaCHS
     include_role:
